@@ -5,9 +5,10 @@
 - Saulo Quiñones Góngora (22506635)  
 - Adrian Felipe Vargas Rojas (22505561)
 
-
 **Curso:** Computación en la nube
+
 **Institución:** Universidad Autónoma de Occidente
+
 **Periodo:** 2026-1S
 
 ## 1. Resumen del proyecto
