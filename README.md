@@ -74,11 +74,7 @@ La aplicación utiliza un modelo de Procesamiento de Lenguaje Natural (NLP) basa
 
 ## 5. Arquitectura del sistema
 
-La solución fue desplegada en AWS utilizando una arquitectura distribuida en dos zonas de disponibilidad, siguiendo un enfoque de alta disponibilidad, aislamiento de red y control de acceso por capas.
-
-La arquitectura combina componentes de red (VPC, subredes, Internet Gateway, NAT Gateway), cómputo (EC2), balanceo de carga (ALB) y contenedores (Docker), permitiendo simular un entorno cercano a producción.
-
----
+La solución fue desplegada en AWS utilizando una arquitectura distribuida en dos zonas de disponibilidad, siguiendo un enfoque de alta disponibilidad, aislamiento de red y control de acceso por capas. La arquitectura combina componentes de red (VPC, subredes, Internet Gateway, NAT Gateway), cómputo (EC2), balanceo de carga (ALB) y contenedores (Docker), permitiendo simular un entorno cercano a producción.
 
 ### 5.1 Diseño de infraestructura
 
@@ -101,8 +97,6 @@ Se implementó una VPC personalizada con segmentación de red en subredes públi
   * Aislada de acceso público.
 
 Este diseño garantiza que los servicios críticos (aplicación y base de datos) operen únicamente dentro de la red privada, mientras que el acceso externo se controla exclusivamente a través del Load Balancer.
-
----
 
 ### 5.1.1 Conectividad a internet (IGW + NAT Gateway)
 
@@ -137,8 +131,6 @@ El NAT Gateway es un componente crítico en esta arquitectura, ya que:
 
 Sin este componente, las instancias privadas no podrían descargar dependencias ni comunicarse con servicios externos.
 
----
-
 ### 5.2 Instancias EC2
 
 Se utilizaron diferentes tipos de instancia según el rol:
@@ -159,8 +151,6 @@ Se utilizaron diferentes tipos de instancia según el rol:
   * Punto de entrada seguro para administración.
   * Permite acceso SSH a instancias privadas sin exponerlas a internet.
 
----
-
 ### 5.3 Contenerización
 
 Cada instancia ejecuta servicios mediante Docker:
@@ -177,8 +167,6 @@ Cada instancia ejecuta servicios mediante Docker:
 La comunicación entre servicios se realiza a través de la red privada de la VPC.
 
 Adicionalmente, las instancias privadas dependen del NAT Gateway para descargar imágenes desde Docker Hub y paquetes del sistema.
-
----
 
 ### 5.4 Application Load Balancer (ALB)
 
@@ -211,8 +199,6 @@ Se configuró un Application Load Balancer de tipo internet-facing con las sigui
 * Redirección del tráfico hacia nodos disponibles en caso de falla.
 * Durante transiciones de estado (healthy/unhealthy) pueden presentarse errores temporales (HTTP 502), asociados al tiempo de detección del health check.
 
----
-
 ### 5.5 Configuración de Security Groups
 
 Se implementó un modelo de seguridad basado en principio de mínimo privilegio, alineado con la arquitectura de red (IGW + NAT Gateway), garantizando que solo los componentes necesarios tengan acceso a internet.
@@ -225,8 +211,6 @@ Se implementó un modelo de seguridad basado en principio de mínimo privilegio,
 * Salida:
 
   * Acceso a instancias privadas.
-
----
 
 #### IA Servers Security Group (`ia-services-sg`)
 
@@ -249,8 +233,6 @@ Se implementó un modelo de seguridad basado en principio de mínimo privilegio,
 
   * Acceso hacia red interna y salida a internet a través del NAT Gateway.
 
----
-
 #### LB Security Group
 
 * Entrada:
@@ -259,8 +241,6 @@ Se implementó un modelo de seguridad basado en principio de mínimo privilegio,
 * Salida:
 
   * Tráfico hacia instancias en puerto 5000
-
----
 
 ### 5.6 Flujo de tráfico
 
@@ -272,15 +252,11 @@ El flujo de la aplicación se define en tres niveles:
 2. El ALB recibe la solicitud HTTP (puerto 80).
 3. El tráfico se enruta a una instancia disponible (A o B) en puerto 5000.
 
----
-
 #### Comunicación interna (app → base de datos)
 
 4. Si la solicitud requiere persistencia:
 
    * IA-server-B se comunica con PostgreSQL en IA-server-A (puerto 5432).
-
----
 
 #### Salida a internet (instancias privadas)
 
@@ -289,8 +265,6 @@ El flujo de la aplicación se define en tres niveles:
    * El tráfico se enruta hacia el NAT Gateway.
    * El NAT Gateway accede a internet mediante el Internet Gateway.
 
----
-
 ### 5.7 Consideraciones de alta disponibilidad
 
 * Despliegue en múltiples AZ.
@@ -298,8 +272,6 @@ El flujo de la aplicación se define en tres niveles:
 * Detección de fallos mediante health checks.
 * Failover automático gestionado por el ALB.
 * Aislamiento de base de datos en una única instancia (posible punto único de falla).
-
----
 
 ### 5.8 Observaciones técnicas
 
@@ -351,13 +323,13 @@ sentiments-app/
 
 ```
 
+---
+
 ## 8. Despliegue con Docker
 
 La aplicación fue desplegada utilizando **Docker y Docker Compose**, lo que permitió definir de forma declarativa los servicios, sus dependencias y la configuración necesaria para su ejecución en cada instancia.
 
 El despliegue se realizó de forma diferenciada en cada servidor, de acuerdo con el rol dentro de la arquitectura.
-
----
 
 ### 8.1 IA-server-A (Aplicación + Base de datos)
 
@@ -400,8 +372,6 @@ services:
 * El puerto **5000** se expone para permitir el acceso desde el Load Balancer.
 * La directiva `depends_on` asegura que el contenedor de la base de datos se inicie antes que la aplicación.
 
----
-
 ### 8.2 IA-server-B (Solo aplicación)
 
 En la instancia IA-server-B se ejecuta únicamente el servicio de aplicación, el cual se conecta a la base de datos ubicada en IA-server-A:
@@ -429,8 +399,6 @@ services:
 * La aplicación mantiene la misma configuración lógica, lo que garantiza consistencia en el comportamiento entre nodos.
 * El puerto **5000** se expone para que el Application Load Balancer pueda enrutar tráfico hacia esta instancia.
 
----
-
 ### 8.3 Consideraciones de diseño
 
 * Se evita la duplicación de la base de datos, centralizando la persistencia en IA-server-A.
@@ -438,8 +406,6 @@ services:
 * La comunicación entre contenedores en IA-server-A se realiza mediante red interna de Docker, mientras que la comunicación entre instancias se realiza mediante la red privada de AWS.
 * El uso de variables de entorno permite desacoplar la configuración de la infraestructura respecto al código de la aplicación.
 * La exposición de puertos se limita a los estrictamente necesarios (5000 para la app y 5432 para PostgreSQL).
-
----
 
 ### 8.4 Ejecución de los servicios
 
@@ -464,8 +430,6 @@ IA-server-B → IA-server-A (PostgreSQL)
 ```
 
 Este esquema permite que la aplicación en múltiples instancias acceda a la base de datos sin exponer servicios críticos a internet.
-
----
 
 ### Arquitectura de conectividad
 
@@ -494,16 +458,12 @@ La red se diseñó combinando componentes clave de AWS:
     * Internamente dentro de la VPC
     * Hacia internet a través del NAT Gateway
 
----
-
 ### Puertos utilizados
 
 * **80** → acceso público (Application Load Balancer)
 * **5000** → aplicación (Flask)
 * **5432** → PostgreSQL
 * **22** → acceso administrativo (SSH vía Bastion Host)
-
----
 
 ### Reglas de comunicación (Security Groups)
 
@@ -526,8 +486,6 @@ Los Security Groups fueron configurados para permitir únicamente el tráfico ne
 
   * Permitida únicamente a través del NAT Gateway
 
----
-
 ### Consideraciones de diseño
 
 * Se evita la exposición directa de las instancias privadas a internet.
@@ -545,23 +503,17 @@ Los Security Groups fueron configurados para permitir únicamente el tráfico ne
 nc -zv <private-ip-A> 5432
 ```
 
----
-
 ### 10.2 Prueba de aplicación
 
 ```bash
 curl http://localhost:5000
 ```
 
----
-
 ### 10.3 Prueba de balanceo
 
 * Acceso al DNS del ALB
 * Recarga de la página
 * Verificación de alternancia entre instancias
-
----
 
 ### 10.4 Prueba de alta disponibilidad
 
