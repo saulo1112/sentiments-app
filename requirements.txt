@@ -1,0 +1,5 @@
+flask==2.3.3
+transformers==4.38.0
+psycopg2-binary==2.9.9
+numpy==1.26.4
+sentencepiece
