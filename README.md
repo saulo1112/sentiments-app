@@ -75,8 +75,7 @@ La aplicación utiliza un modelo de Procesamiento de Lenguaje Natural (NLP) basa
 ## 5. Arquitectura del sistema
 
 La solución fue desplegada en AWS utilizando una arquitectura distribuida en dos zonas de disponibilidad, siguiendo un enfoque de alta disponibilidad, aislamiento de red y control de acceso por capas. La arquitectura combina componentes de red (VPC, subredes, Internet Gateway, NAT Gateway), cómputo (EC2), balanceo de carga (ALB) y contenedores (Docker), permitiendo simular un entorno cercano a producción.
-<img width="1441" height="1150" alt="UML - App physical recovery-Page-2 drawio" src="https://github.com/user-attachments/assets/f6d165cc-01a5-42d6-b331-fabfb0d47bc0" />
-
+<img width="1441" height="1150" alt="UML - App physical recovery-Page-2 drawio" src="https://github.com/user-attachments/assets/e6a589c1-2b92-4ab7-bb88-1fd24be8417a" />
 
 ### 5.1 Diseño de infraestructura
 
