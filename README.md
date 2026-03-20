@@ -332,28 +332,24 @@ Esto garantiza continuidad del servicio.
 
 ## 7. Estructura del proyecto
 
+La estructura del proyecto se diseñó de forma simple y directa, separando la configuración de despliegue (Docker y Docker Compose) del código de la aplicación.
+
+Se utilizan dos archivos de Docker Compose para diferenciar el despliegue entre nodos:
+
+- `docker-compose-A.yml`: incluye aplicación y base de datos
+- `docker-compose-B.yml`: incluye únicamente la aplicación, conectándose a la base de datos remota
+
 ```
-sentiment-app/
+sentiments-app/
 │
-├── app/
-│   ├── docker-compose.yml        # Definición de servicios (app + db en A)
-│   ├── Dockerfile               # Configuración de imagen
-│
-├── src/                         # Código de la aplicación
-│   ├── main.py                  # Punto de entrada Flask
-│   ├── model.py                 # Carga del modelo NLP
-│   ├── database.py              # Conexión a PostgreSQL
-│   └── utils.py                 # Funciones auxiliares
-│
-├── requirements.txt             # Dependencias
-└── README.md
+├── Dockerfile                 # Definición de la imagen de la aplicación
+├── docker-compose-A.yml       # Orquestación (app + db en IA-server-A)
+├── docker-compose-B.yml       # Orquestación (solo app en IA-server-B)
+├── app.py                     # Aplicación principal (Flask)
+├── requirements.txt           # Dependencias del proyecto
+└── README.md                  # Documentación del proyecto
+
 ```
-
----
-
-Perfecto, aquí sí vale la pena ser más técnico y apoyarse en fragmentos de código. Te dejo el apartado mejorado con explicación clara y viñetas donde aporta valor:
-
----
 
 ## 8. Despliegue con Docker
 
