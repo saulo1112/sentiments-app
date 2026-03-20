@@ -1,0 +1,13 @@
+services:
+  app:
+    image: adrianfvr999/sentiment-app:latest
+    container_name: sentiment-app
+    restart: unless-stopped
+    environment:
+      DB_HOST: IP_PRIVADA_DE_LA_INSTANCIA_A
+      DB_PORT: 5432
+      DB_NAME: sentimentdb
+      DB_USER: admin
+      DB_PASSWORD: password123
+    ports:
+      - "5000:5000"
