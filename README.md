@@ -282,10 +282,6 @@ El flujo de la aplicación se define en tres niveles:
 * El uso de Docker facilita portabilidad y despliegue reproducible.
 * La separación de roles (app vs db) permite escalabilidad futura.
 
-### 5.9 Diagrama de la arquitectura diseñada
-
-En la figura planteada a continuación, se evidencia el diagrama con el diseño de la arquitectura realizada.
-
 ---
 
 ## 6. Diseño de alta disponibilidad
